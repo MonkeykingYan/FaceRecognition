@@ -1,0 +1,58 @@
+clc;
+clear;
+image dir
+images = imageSet('att_faces','recursive');
+
+each subfolders have 10 images of a person so split it in to 8:2
+ [training,test] = partition(images,[0.8 0.2]);
+apply hog feature extraction to the training images  
+  w = 0; 
+featureCount = 1;
+for i=1:length(training) 
+    for j = 1:training(i).Count
+         feature(featureCount,:) = extractHOGFeatures(read(training(i),j));
+          trainingLabel{featureCount} = training(i).Description;    
+        featureCount = featureCount + 1; 
+    end
+     imageIndex{i} = training(i).Description;
+   
+end
+
+person =3;
+testimage = read(test(person),1);
+TFeatures = extractHOGFeatures(testimage);
+
+x = feature;
+y = TFeatures;
+d = 0;
+min = 0;
+pic=0;
+
+for ii = 1:size(x)
+    
+    
+    for q = 1:length(y)
+ d = d +( y(q) - x(ii,q)).^2 ;
+ 
+    end
+    X=sqrt(d);
+if ii ==1
+    min=sqrt(d);
+    pic=ii;
+end
+
+if X < min
+    min = X;
+    pic=ii;
+end
+d=0;
+end
+per =round(pic/8);
+imshow(read(test(person),1)); title('test image');
+figure,
+imshow(read(training(per),1)); title('output image');
+ 
+ if person == per
+     w = w +1;
+     
+ end 
